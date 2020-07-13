@@ -1,0 +1,27 @@
+%h2 アイテム予約履歴
+
+%table.table
+  %thead.thead-light
+    %tr
+      %th{ scope: 'col' } ID
+      %th{ scope: 'col' } アイテム名
+      %th{ scope: 'col' } 数量
+      -# %th{ scope: 'col' } 予約名
+      %th{ scope: 'col' } 予約日
+      %th{ scope: 'col' } 開始日
+      %th{ scope: 'col' } 終了日
+      %th
+
+  %tbody
+    - @web_reservations.each do |web_reservation|
+      - reservation = web_reservation.mng_reservation.present? ? web_reservation.mng_reservation : web_reservation
+      %tr
+        %td= reservation.id
+        %td= reservation.item.item_name
+        %td= reservation.number
+        -# %td= reservation.reservation_name
+        %td= reservation.reservation_date.strftime("%Y/%m/%d")
+        %td= reservation.start_date.strftime("%Y/%m/%d")
+        %td= reservation.end_date.strftime("%Y/%m/%d")
+        %td= link_to '表示', web_reservation, class: 'btn btn-outline-dark btn-sm'
+= paginate @web_reservations

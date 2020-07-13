@@ -1,0 +1,49 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title 予約システム
+    = csrf_meta_tags
+    = csp_meta_tag
+    = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload'
+    = javascript_pack_tag 'application', 'data-turbolinks-track': 'reload'
+    = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
+  %body{style: 'padding-top: 70px;'}
+    .fixed-top
+      %nav.navbar.navbar-expand-md.bg-mytop.navbar-dark.bg-primary
+        .container
+          = link_to '予約システム', root_path, class: 'navbar-brand'
+          %button.navbar-toggler{type: 'button', 'data-toggle': 'collapse', 'data-target': '#navbarNavDropdown', 'aria-controls': 'navbarNavDropdown', 'aria-expanded': false, 'aria-label': 'Toggle navigation'}
+            %span.navbar-toggler-icon
+          .collapse.navbar-collapse#navbarNavDropdown
+            %ul.navbar-nav.mr-auto
+              - if user_signed_in?
+                %li.nav-item
+                  %a.nav-link{href: web_reservations_path}
+                    予約履歴
+            %ul.navbar-nav
+              - if user_signed_in?
+                %li.nav-item
+                  %a.nav-link{href: edit_user_registration_path}
+                    #{current_user.user_name} さん
+                %li.nav-item
+                  %a.nav-link{href: destroy_user_session_path, 'data-method': :delete}
+                    ログアウト
+              - else
+                %li.nav-item
+                  %a.nav-link{href: new_user_registration_path}
+                    サインアップ
+                %li.nav-item
+                  %a.nav-link{href: new_user_session_path}
+                    ログイン
+    .container
+      %header
+        -if flash.notice
+          %script{ type: 'text/javascript' }
+            $(function(){ toastr.info('#{flash.notice}'); });
+        -if flash.alert
+          %script{ type: 'text/javascript' }
+            $(function(){ toastr.warning('#{flash.alert}'); });
+      = yield
+      %footer
+        .fixed-bottom.bg-mytop &copy; 2020

@@ -1,0 +1,28 @@
+%h2 アイテムの予約状況（予約数 / アイテム数）
+
+.row.align-items-center
+  .col-lg-4.text-right
+    = link_to "<<", status_web_reservations_path(date_from: (@date_from - 7)), class: 'btn btn-outline-secondary'
+    = link_to "<", status_web_reservations_path(date_from: (@date_from - 1)), class: 'btn btn-outline-secondary'
+  .col-lg-4.text-center
+    = form_with(url: status_web_reservations_path, method: :get, local: true, class: 'simple_form') do |f|
+      = f.date_field :date_from, value: @date_from, class: 'form-control mx-1'
+  .col-lg-4.text-left
+    = link_to ">", status_web_reservations_path(date_from: (@date_from + 1)), class: 'btn btn-outline-secondary'
+    = link_to ">>", status_web_reservations_path(date_from: (@date_from + 7)), class: 'btn btn-outline-secondary'
+
+%table.table.table-bordered.table-sm
+  %thead.thead-light
+    %tr
+      %th.align-middle.text-center{style: "width:30%"} アイテム名
+      - (@date_from..@date_to).each do |date|
+        %th.align-middle.text-center{style: "width:10%"}= date_to_s_with_wday(date)
+  %tbody
+    - @items.each do |item|
+      - map = ReservedMap.new(item, @date_from, @date_to)
+      %tr
+        %td.align-middle.text-center= item.item_name
+        - (@date_from..@date_to).each do |date|
+          = td_rate_tag(map.reserved(date), item.stock)
+
+= link_to '新しい予約', new_web_reservation_path, class: 'btn btn-primary'

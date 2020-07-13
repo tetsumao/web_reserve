@@ -1,0 +1,31 @@
+%h2
+  予約の詳細
+  = @web_reservation.mng_reservation.present? ? '(承認済)' : ''
+
+- reservation = @web_reservation.mng_reservation.present? ? @web_reservation.mng_reservation : @web_reservation
+.row.mb-3
+  .col-6.p-1
+    .card
+      .card-header アイテム名
+      .card-body= reservation.item.item_name
+  .col-6.p-1
+    .card
+      .card-header 数量
+      .card-body= reservation.number
+.card.mb-3
+  .card-header 予約名
+  .card-body= reservation.reservation_name
+.card.mb-3
+  .card-header 予約日
+  .card-body= reservation.reservation_date.strftime("%Y/%m/%d")
+.row.mb-3
+  .col-6.p-1
+    .card
+      .card-header 開始日
+      .card-body= reservation.start_date.strftime("%Y/%m/%d")
+  .col-6.p-1
+    .card
+      .card-header 終了日
+      .card-body= reservation.end_date.strftime("%Y/%m/%d")
+
+= link_to '戻る', web_reservations_path, class: 'btn btn-outline-secondary'

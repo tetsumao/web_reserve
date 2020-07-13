@@ -1,0 +1,20 @@
+%h2 アイテム一覧
+
+%table.table
+  %thead.thead-light
+    %tr
+      %th{ scope: 'col' } ID
+      %th{ scope: 'col' } アイテム名
+      %th{ scope: 'col' } ストック数
+      %th{ scope: 'col' } 説明
+      %th{ scope: 'col' } 表示順
+
+  %tbody
+    - @items.each do |item|
+      %tr
+        %td= item.id
+        %td= item.item_name
+        %td= item.stock
+        %td= item.description
+        %td= item.dspo
+= paginate @items

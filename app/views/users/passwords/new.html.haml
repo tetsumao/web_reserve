@@ -1,0 +1,8 @@
+%h2 パスワードをお忘れですか？
+= simple_form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f|
+  = f.error_notification
+  .form-inputs
+    = f.input :email, required: true, autofocus: true, input_html: { autocomplete: "email" }
+  .form-actions.text-center
+    = f.button :submit, "パスワードのリセット手順を送信", class: 'btn btn-primary'
+= render "users/shared/links"
