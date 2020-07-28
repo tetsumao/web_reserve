@@ -1,8 +1,10 @@
+# class ApiController < ActionController::API を使うとCSRFトークン認証のskipが不要になりそう
+# app/api/application_controller.rb でActionController::API継承するとよさそう
 class ApiController < ApplicationController
   include ActionController::HttpAuthentication::Token::ControllerMethods
 
   # CSRFトークン認証対応
-  skip_before_action :verify_authenticity_token
+  # skip_before_action :verify_authenticity_token
   before_action :token_authenticate, except: [:sign_in]
 
   def sign_in
@@ -106,6 +108,11 @@ class ApiController < ApplicationController
       web_reservation.attributes = h_web
 
       if h_web.present?
+        # web_reservationモデルにロジックをもたせたい
+        # 予約側：webとmngのマスタ、管理側：mngのマスタを扱っているので、予約側は1つのマスタにしたい。理想は予約側と管理側で1つのマスタだけど。
+
+        # reservation専用のコントローラをつくるとスッキリかけそう。
+
         # 生成済みでもIDが異なるなら削除
         if web_reservation.mng_reservation.present? && (h_mng.blank? || web_reservation.mng_reservation.id.to_s != h_mng['id'].to_s)
           puts "mng_reservation re-created #{web_reservation.mng_reservation.id}"
@@ -140,6 +147,12 @@ class ApiController < ApplicationController
   private
     def token_authenticate
       authenticate_or_request_with_http_token do |token, options|
+
+        # Linkageモデルに有効期限のみのscopeをつくる
+        # find_by! で見つからないと例外を出せる
+        # @linkage = Linkage.available.find_by!(token: token)
+        # @linkage.destroyが不要なのであればTransactionも不要になる
+
         Linkage.transaction do
           @linkage = Linkage.find_by(token: token)
           # 60分で無効
