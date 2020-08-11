@@ -18,6 +18,37 @@ class WebReservation < ApplicationRecord
 
   scope :has_not_mng, -> {left_joins(:mng_reservation).where('mng_reservations.id IS NULL')}
 
+  def update_mng_linkage(h_web, h_mng)
+    WebReservation.transaction do
+      self.attributes = h_web
+      if h_web.present?
+        # 生成済みでもIDが異なるなら削除
+        if self.mng_reservation.present? && (h_mng.blank? || self.mng_reservation.id.to_s != h_mng['id'].to_s)
+          puts "mng_reservation re-created #{self.mng_reservation.id}"
+          self.mng_reservation.destroy
+          self.mng_reservation = nil
+        end
+
+        if self.mng_reservation.present?
+          puts "web_reservation.mng_reservation.present? true #{self.mng_reservation.id}"
+          self.mng_reservation.attributes = h_mng
+          self.mng_reservation.save!
+        elsif h_mng.present?
+          puts "web_reservation.mng_reservation.present? false"
+          self.mng_reservation = MngReservation.new(h_mng)
+          self.mng_reservation.save!
+        end
+
+      # 予約情報が消えた場合
+      elsif self.mng_reservation.present?
+        puts "web_reservation.mng_reservation destroy #{self.mng_reservation.id}"
+        self.mng_reservation.destroy
+        self.mng_reservation = nil
+      end
+      save
+    end
+  end
+
   private
     def validate_start_date
       errors.add(:start_date, 'は本日以降を選択してください') if start_date < Date.today
